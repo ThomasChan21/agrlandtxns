@@ -53,7 +53,8 @@ var exchange_land = L.layerGroup();
 var modi_land = L.layerGroup();
 var private_treaty_land = L.LayerGroup();
 
-const txn_type_array = [exchange_land, modi_land, private_treaty_land];
+const txn_type_layer_array = [exchange_land, modi_land, private_treaty_land];
+const txn_type_array = ["exchange", "modi", "private_treaty"];
 
 function formatNumber(num) {
 	return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
@@ -91,7 +92,7 @@ $.getJSON(url, function(data) {
 	$.each(data.features, function(key, value) {
 		for (i=0; i<txn_type_array.length; i++) {
 			if (txn_type_array[i] == value.properties.txn_type) {
-				var targetlayer = txn_type_array[i];
+				var targetlayer = txn_type_layer_array[i];
 				L.geoJSON(value, {style: txn_style})
 					.bindPopup("<b>地點: </b>" + value.properties.location + "<br>" 
 					+ "<b>地段編號: </b>" + value.properties.lot_number + "<br>"
