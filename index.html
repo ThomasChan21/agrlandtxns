@@ -49,12 +49,15 @@ var imagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/
 var url = "data/agrlandtxnsdata.geojson"
 
 // Markers
-var exchangeland = L.layerGroup();
+var exchange_land = L.layerGroup();
+var modi_land = L.layerGroup();
+var private_treaty_land = L.LayerGroup();
+
+const txn_type_array = [exchange_land, modi_land, private_treaty_land];
 
 function formatNumber(num) {
 	return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
 }
-
 
 // Map
 var map = L.map('map', {center: [22.35165, 114.11917], zoom: 12, layers: [osm, exchangeland]});
@@ -86,19 +89,22 @@ function txn_color(type) {
 
 $.getJSON(url, function(data) {
 	$.each(data.features, function(key, value) {
-		if (value.properties.txn_type == "exchange") {
-			L.geoJSON(value, {style: txn_style})
-				.bindPopup("<b>地點: </b>" + value.properties.location + "<br>" 
-				+ "<b>地段編號: </b>" + value.properties.lot_number + "<br>"
-				+ "<b>用途: </b>" + value.properties.user + "<br>"
-				+ "<b>地盤面積（平方呎）: </b>" + formatNumber(value.properties.site_area_in_SF) + "<br>"
-				+ "<b>可建樓面面積（平方呎）: </b>" + formatNumber(value.properties.gfa_in_SF) + "<br>"
-				+ "<b>地價（百萬元）: </b>$" + formatNumber(value.properties.consideration) + "<br>"
-				+ "<b>每呎樓面地價/補價: </b>$" + formatNumber(value.properties.AV) + "<br>"
-				+ "<b>發展商: </b>" + value.properties.developer + "<br>"
-				+ "<b>簽辦/交易日期: </b>" + value.properties.txn_date + "<br>"
-				+ "<b>備註: </b>" + value.properties.remark)
-				.addTo(exchangeland);	
+		for (i=0; i<txn_type_array.length; i++) {
+			if (txn_type_array[i] == value.properties.txn_type) {
+				var targetlayer = txn_type_array[i];
+				L.geoJSON(value, {style: txn_style})
+					.bindPopup("<b>地點: </b>" + value.properties.location + "<br>" 
+					+ "<b>地段編號: </b>" + value.properties.lot_number + "<br>"
+					+ "<b>用途: </b>" + value.properties.user + "<br>"
+					+ "<b>地盤面積（平方呎）: </b>" + formatNumber(value.properties.site_area_in_SF) + "<br>"
+					+ "<b>可建樓面面積（平方呎）: </b>" + formatNumber(value.properties.gfa_in_SF) + "<br>"
+					+ "<b>地價（百萬元）: </b>$" + formatNumber(value.properties.consideration) + "<br>"
+					+ "<b>每呎樓面地價/補價: </b>$" + formatNumber(value.properties.AV) + "<br>"
+					+ "<b>發展商: </b>" + value.properties.developer + "<br>"
+					+ "<b>簽辦/交易日期: </b>" + value.properties.txn_date + "<br>"
+					+ "<b>備註: </b>" + value.properties.remark)
+					.addTo(targetlayer);	
+			};
 		};
 	});
 });
@@ -113,7 +119,9 @@ var baseMaps = {
 };
 var overlayMaps = {
     "Subject Property": singleMarker,
-	"Transactions Type" : exchangeland
+	"Land Exchange Type" : exchange_land,
+	"Lease Modiifcation Type" : modi_land,
+	"Private Treaty Type" : private_treaty_land
 };
 L.control.layers(baseMaps, overlayMaps, {position: "topleft", collapsed: true}).addTo(map);
 
