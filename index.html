@@ -70,11 +70,24 @@ var singleMarker = L.marker([22.35165, 114.11917], { icon: myIcon, draggable: tr
 var popup = singleMarker.bindPopup('目標物業' + singleMarker.getLatLng()).openPopup();
 popup.addTo(map);
 
+function txn_style(feature) {
+	return {
+		color: "red",
+		fillColor: txn_color(feature.properties.txn_type),
+		fillOpacity: 0.3
+	};
+}
+
+function txn_color(type) {
+	if (type === "exchange") return "blue"; else
+	if (type === "private_treaty") return "yellow"; else
+	return "grey";
+}
 
 $.getJSON(url, function(data) {
 	$.each(data.features, function(key, value) {
 		if (value.properties.txn_type == "exchange") {
-			L.geoJSON(value)
+			L.geoJSON(value, {style: txn_style})
 				.bindPopup("<b>地點: </b>" + value.properties.location + "<br>" 
 				+ "<b>地段編號: </b>" + value.properties.lot_number + "<br>"
 				+ "<b>用途: </b>" + value.properties.user + "<br>"
