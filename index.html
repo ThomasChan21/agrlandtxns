@@ -90,8 +90,9 @@ function txn_color(type) {
 
 $.getJSON(url, function(data) {
 	$.each(data.features, function(key, value) {
+		var doctype = value.properties.txn_type;
 		for (i=0; i<txn_type_array.length; i++) {
-			if (value.properties.txn_type == txn_type_array[i]) {
+			if (doctype == txn_type_array[i]) {
 				var targetlayer = txn_type_layer_array[i];
 				L.geoJSON(value, {style: txn_style})
 					.bindPopup("<b>地點: </b>" + value.properties.location + "<br>" 
